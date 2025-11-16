@@ -1,6 +1,7 @@
 #-------------------------------------------------------------------------------
 # File: sistem_kasir.py
 # Deskripsi: Sistem kasir sederhana untuk bisnis pribadi (versi diperbaiki)
+# Menambahkan fitur: tampilkan semua stok produk beserta jumlahnya pada manajemen produk
 #-------------------------------------------------------------------------------
 
 import json
@@ -152,6 +153,30 @@ def pembelian_stok():
     print(f"\n✅ Stok {produk_data[kode]['nama']} berhasil ditambahkan sebanyak {jumlah_tambah}.")
     print(f"Stok Baru: {produk_data[kode]['stok']}")
     simpan_data()
+
+# #103 - Fungsi Tampilkan Semua Stok Produk (FITUR BARU)
+def tampilkan_semua_stok():
+    """Menampilkan semua produk beserta jumlah stoknya dalam format tabel."""
+    print("\n==================================")
+    print("      📦 DAFTAR STOK PRODUK      ")
+    print("==================================")
+
+    if not produk_data:
+        print("Belum ada produk terdaftar.")
+        return
+
+    print(f"{'No':<4}{'Barcode':<16}{'Nama':<30}{'Stok':<8}{'Harga':<16}{'Diskon':<8}")
+    print("-" * 90)
+    i = 1
+    # Sortir berdasarkan nama produk untuk keteraturan
+    for barcode in sorted(produk_data.keys(), key=lambda k: produk_data[k]['nama'].lower()):
+        p = produk_data[barcode]
+        nama_pendek = p['nama'][:27] + '...' if len(p['nama']) > 30 else p['nama']
+        diskon_persen = int(p.get('diskon', 0.0) * 100)
+        print(f"{i:<4}{barcode:<16}{nama_pendek:<30}{p.get('stok',0):<8}{format_harga(p.get('harga',0.0)):<16}{diskon_persen}%")
+        i += 1
+
+    print("-" * 90)
 
 # -------------------------------------------------------------------------------
 # MODE KASIR (PENJUALAN)
@@ -424,7 +449,7 @@ def menu_utama():
         print("      SISTEM KASIR BISNISKU      ")
         print("==================================")
         print("1. 🛒 Mode Kasir (Penjualan)")
-        print("2. 📦 Manajemen Produk (Tambah/Edit, Stok)")
+        print("2. 📦 Manajemen Produk (Tambah/Edit, Stok, Tampilkan Stok)")
         print("3. 📈 Laporan Penjualan & Riwayat")
         print("4. ❌ Keluar Program")
 
@@ -438,14 +463,17 @@ def menu_utama():
                 print("\n--- MANAJEMEN PRODUK ---")
                 print("1. Tambah/Edit Produk (Barcode, Nama, Harga, Diskon)")
                 print("2. Pembelian Stok (Stock In)")
-                print("3. Kembali ke Menu Utama")
-                pilihan_manajemen = input("Pilih aksi (1-3): ").strip()
+                print("3. Tampilkan Semua Stok Produk")
+                print("4. Kembali ke Menu Utama")
+                pilihan_manajemen = input("Pilih aksi (1-4): ").strip()
 
                 if pilihan_manajemen == '1':
                     tambah_produk()
                 elif pilihan_manajemen == '2':
                     pembelian_stok()
                 elif pilihan_manajemen == '3':
+                    tampilkan_semua_stok()
+                elif pilihan_manajemen == '4':
                     break
                 else:
                     print("Pilihan tidak valid.")
